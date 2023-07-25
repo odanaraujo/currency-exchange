@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (ed *ExchangeDomain) SaveConvertedCurrencies(ExchangeDomain) *exception.Exception {
+func (ed *ExchangeDomain) SaveConvertedCurrencies(ExchangeDomainInterface) *exception.Exception {
 	logger.Info("init saveConvertedCurrencies model", zap.String("journey", "saveConvertedCurrencies"))
 	return nil
 }

@@ -1,11 +1,12 @@
 package controller
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/odanaraujo/currency-exchange/config/exception"
+	"github.com/odanaraujo/currency-exchange/config/logger"
+	"github.com/odanaraujo/currency-exchange/src/controller/response"
 	"github.com/odanaraujo/currency-exchange/src/model"
-	"github.com/odanaraujo/currency-exchange/src/model/request"
+	"go.uber.org/zap"
 	"net/http"
 	"strconv"
 )
@@ -24,21 +25,26 @@ func CurrencyConverter(c *gin.Context) {
 	amount, _ := strconv.ParseFloat(amountParams, 64)
 	rate, _ := strconv.ParseFloat(rateParams, 64)
 
-	exchangeRequest := request.ExchangeRequest{
-		FromCurrency: from,
-		ToCurrency:   to,
-		Amount:       amount,
-		Rate:         rate,
+	domain := model.NewExchangeDomain(from, to, amount, rate)
+
+	validateParameterFields(c, *domain)
+
+	if err := domain.SaveConvertedCurrencies(domain); err != nil {
+		c.JSON(err.Code, err)
+		return
 	}
 
-	validateParameterFields(c, exchangeRequest)
+	logger.Info("successful conversion",
+		zap.String("journey", "CurrencyConverterController"))
 
-	fmt.Println(exchangeRequest)
+	res := response.ExchangeResponse{domain.Rate, "$"}
+
+	c.JSON(http.StatusOK, res)
 }
 
-func validateParameterFields(c *gin.Context, exchangeRequest request.ExchangeRequest) {
+func validateParameterFields(c *gin.Context, exchange model.ExchangeDomain) {
 
-	if exchangeRequest.ValidTypeFloat() || exchangeRequest.ValidTypeString() {
+	if exchange.ValidTypeFloat() || exchange.ValidTypeString() {
 		excepResponse := exception.NewBadRequestError("Parameter fields are incorrect")
 		c.JSON(http.StatusBadRequest, excepResponse)
 		return
