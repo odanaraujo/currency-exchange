@@ -5,7 +5,6 @@ import (
 	"github.com/odanaraujo/currency-exchange/config/logger"
 	"github.com/odanaraujo/currency-exchange/src/controller/response"
 	"github.com/odanaraujo/currency-exchange/src/model"
-	"github.com/odanaraujo/currency-exchange/src/model/service"
 	"go.uber.org/zap"
 	"net/http"
 	"strconv"
@@ -15,7 +14,7 @@ var (
 	ExchangeDomainInterface model.ExchangeDomainInterface
 )
 
-func CurrencyConverter(c *gin.Context) {
+func (e exchageControllerInterface) CurrencyConverter(c *gin.Context) {
 
 	amountParams := c.Params.ByName("amount")
 	from := c.Params.ByName("from")
@@ -27,9 +26,7 @@ func CurrencyConverter(c *gin.Context) {
 
 	domain := model.NewExchangeDomain(from, to, amount, rate)
 
-	exchangeService := service.NewExchangeDomainService()
-
-	if err := exchangeService.SaveExchangeCurrency(domain); err != nil {
+	if err := e.service.SaveExchangeCurrency(domain); err != nil {
 		c.JSON(err.Code, err)
 		return
 	}

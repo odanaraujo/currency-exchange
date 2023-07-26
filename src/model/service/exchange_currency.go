@@ -9,15 +9,18 @@ import (
 
 func (ed *exchangeDomainService) SaveExchangeCurrency(domainInterface model.ExchangeDomainInterface) *exception.Exception {
 
-	logger.Info("init save exchange currency model", zap.String("journey", "ExchangeCurrency"))
-	if err := ed.validTypeString(domainInterface); !err {
+	logger.Info("init save exchange currency model", zap.String("journey", "SaveExchangeCurrency"))
+
+	if err := ed.validTypeFloat(domainInterface); err {
 		ex := exception.NewBadRequestError("Incorrect or empty field type")
 		return ex
 	}
-	if err := ed.validTypeFloat(domainInterface); !err {
+
+	if err := ed.validTypeString(domainInterface); err {
 		ex := exception.NewBadRequestError("Incorrect or empty field type")
 		return ex
 	}
+
 	return nil
 }
 
