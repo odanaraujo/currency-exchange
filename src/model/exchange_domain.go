@@ -1,26 +1,32 @@
 package model
 
-import "github.com/odanaraujo/currency-exchange/config/exception"
-
-func NewExchangeDomain(fromCurrency, toCurrency string, amount, rate float64) *ExchangeDomain {
-	return &ExchangeDomain{fromCurrency, toCurrency, amount, rate}
-}
-
-type ExchangeDomain struct {
-	FromCurrency string
-	ToCurrency   string
-	Amount       float64
-	Rate         float64
-}
-
 type ExchangeDomainInterface interface {
-	SaveConvertedCurrencies(ExchangeDomainInterface) *exception.Exception
+	GetFromCurrency() string
+	GetToCurrency() string
+	GetAmount() float64
+	GetRate() float64
 }
 
-func (ed *ExchangeDomain) ValidTypeFloat() bool {
-	return ed.Rate == 0 || ed.Amount == 0
+func NewExchangeDomain(fromCurrency, toCurrency string, amount, rate float64) *exchangeDomain {
+	return &exchangeDomain{fromCurrency, toCurrency, amount, rate}
 }
 
-func (ed *ExchangeDomain) ValidTypeString() bool {
-	return ed.FromCurrency == "" || ed.ToCurrency == "" || len(ed.FromCurrency) < 2 || len(ed.ToCurrency) < 2
+type exchangeDomain struct {
+	fromCurrency string
+	toCurrency   string
+	amount       float64
+	rate         float64
+}
+
+func (ed *exchangeDomain) GetFromCurrency() string {
+	return ed.fromCurrency
+}
+func (ed *exchangeDomain) GetToCurrency() string {
+	return ed.toCurrency
+}
+func (ed *exchangeDomain) GetAmount() float64 {
+	return ed.amount
+}
+func (ed *exchangeDomain) GetRate() float64 {
+	return ed.rate
 }
